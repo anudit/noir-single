@@ -16,8 +16,8 @@ fn main() {
 
     println!("Initializing witness...");
     let mut initial_witness = WitnessMap::new();
-    initial_witness.insert(Witness(1), FieldElement::zero());
-    initial_witness.insert(Witness(2), FieldElement::from(1_i128));
+    initial_witness.insert(Witness(0), FieldElement::zero());
+    initial_witness.insert(Witness(1), FieldElement::from(1_i128));
 
     dbg!(String::from(bytecode));
 
