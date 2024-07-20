@@ -5,3 +5,4 @@ notes.txt
 # Added by cargo
 
 /target
+*.dat
