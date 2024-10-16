@@ -1,3 +1,7 @@
+export NDK_VERSION=26.1.10909125
+export HOST_TAG=darwin-x86_64
+export ANDROID_ABI=arm64-v8a
+
 # Check that $ANDROID_HOME, $NDK_VERSION and $HOST_TAG are set
 if [ -z "$ANDROID_HOME" ]; then
   echo "ANDROID_HOME is not set (e.g. /Users/<username>/Library/Android/sdk)" >&2
@@ -31,5 +35,3 @@ export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin
 export PATH=$PATH:$TOOLCHAIN/bin
 export CMAKE_TOOLCHAIN_FILE_aarch64_linux_android=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
 export CMAKE_TOOLCHAIN_FILE_armv7_linux_androideabi=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
-# export ANDROID_ABI=arm64-v8a
-export ANDROID_ABI=armeabi-v7a

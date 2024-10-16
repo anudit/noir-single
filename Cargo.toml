@@ -2,10 +2,15 @@
 name = "noir-single"
 version = "0.1.0"
 edition = "2021"
+default-run = "noir-single"
 
 [dependencies]
-noir_rs = { git = "https://github.com/madztheo/noir_rs.git", branch = "v0.30.0", package = "noir_rs" }
+noir_rs = { git = "https://github.com/anudit/noir_rs.git", branch = "v0.32.0", package = "noir_rs" }
 openssl = { version = "0.10", features = ["vendored"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.125"
 hex = "0.4"
+
+[[bin]]
+name = "srsdown"
+path = "src/bin/srsdown.rs"
