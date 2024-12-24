@@ -5,7 +5,10 @@ edition = "2021"
 default-run = "noir-single"
 
 [dependencies]
-noir_rs = { git = "https://github.com/anudit/noir_rs.git", branch = "v0.32.0", package = "noir_rs" }
+# noir_rs = { git = "https://github.com/anudit/noir_rs.git", branch = "v0.32.0", package = "noir_rs" }
+noir_rs = { git = "https://github.com/zkpassport/noir_rs.git", branch = "v1.0.0-beta.0", features = [
+    "barretenberg",
+] }
 openssl = { version = "0.10", features = ["vendored"] }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = "1.0.125"
