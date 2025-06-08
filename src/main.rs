@@ -1,7 +1,9 @@
 use noir_rs::{
-    barretenberg::{prove::prove_ultra_honk, srs::setup_srs, verify::verify_ultra_honk},
+    barretenberg::{
+        prove::prove_ultra_honk, srs::setup_srs_from_bytecode, utils::get_honk_verification_key,
+        verify::verify_ultra_honk,
+    },
     native_types::{Witness, WitnessMap},
-    witness::from_vec_str_to_witness_map,
     FieldElement,
 };
 use serde_json::{to_string, Value};
@@ -13,21 +15,19 @@ fn noir_prove(witness_str: String, bytecode: String) -> (String, String) {
     let initial_witness_vals: Vec<&str> = serde_json::from_str::<Vec<&str>>(&witness_str)
         .expect("Failed to parse initial_witness JSON string");
 
-    // let initial_witness_vec: Vec<FieldElement> = initial_witness_vals
-    //     .into_iter()
-    //     .filter_map(|hex_str| i128::from_str_radix(hex_str.trim_start_matches("0x"), 16).ok())
-    //     .map(FieldElement::from)
-    //     .collect();
+    let vk = get_honk_verification_key(&bytecode, false).unwrap();
 
-    // let mut initial_witness = WitnessMap::new();
-    // for (i, witness) in initial_witness_vec.into_iter().enumerate() {
-    //     initial_witness.insert(Witness(i as u32), witness);
-    // }
+    let mut witness_map = WitnessMap::new();
 
-    let initial_witness = from_vec_str_to_witness_map(initial_witness_vals).unwrap();
+    for (i, witness) in initial_witness_vals.iter().enumerate() {
+        witness_map.insert(
+            Witness(i as u32),
+            FieldElement::try_from_str(*witness).unwrap_or_default(),
+        );
+    }
 
     println!("Generating proof...");
-    let (proof, vk) = prove_ultra_honk(&bytecode, initial_witness, false).unwrap();
+    let proof = prove_ultra_honk(&bytecode, witness_map, false).unwrap();
 
     let proof_hex = hex::encode(&proof);
     let vk_hex = hex::encode(&vk);
@@ -36,17 +36,6 @@ fn noir_prove(witness_str: String, bytecode: String) -> (String, String) {
 }
 
 fn main() {
-    env::set_var("RUST_LOG", "trace");
-
-    // const BYTECODE: &str = "H4sIAAAAAAAA/62QQQqAMAwErfigpEna5OZXLLb/f4KKLZbiTQdCQg7Dsm66mc9x00O717rhG9ico5cgMOfoMxJu4C2pAEsKioqisnslysoaLVkEQ6aMRYxKFc//ZYQr29L10XfhXv4jB52E+OpMAQAA";
-    // setup_srs(BYTECODE, None, false).unwrap();
-    // let initial_witness = from_vec_str_to_witness_map(vec!["5", "6", "0x1e"]).unwrap();
-    // let start = std::time::Instant::now();
-    // let (proof, vk) = prove_ultra_honk(BYTECODE, initial_witness, false).unwrap();
-    // println!("Proof generation time: {:?}", start.elapsed());
-    // let verdict = verify_ultra_honk(proof, vk).unwrap();
-    // println!("Proof verification verdict: {}", verdict);
-
     let data = fs::read_to_string("./target/hello_world.json").expect("Unable to read file");
     let json: Value = serde_json::from_str(&data).expect("Unable to parse JSON");
     let bytecode: &str = json["bytecode"]
@@ -54,7 +43,7 @@ fn main() {
         .expect("Unable to extract bytecode");
 
     let start_srs = Instant::now();
-    let srs_size = setup_srs(&bytecode, None, false)
+    let srs_size = setup_srs_from_bytecode(&bytecode, None, false)
         .ok()
         .expect("srs_size failed");
 
@@ -64,13 +53,14 @@ fn main() {
         (Instant::now().duration_since(start_srs).as_millis())
     );
 
-    let start_prove = Instant::now();
     let witness = Vec::from([
-        "310939249775",
-        "8909325935247956566886129074037753319",
-        "268167857309995084666739127329335872722",
+        "96231036770496792094352034415266785651",
+        "43134663917389751815297038278526500864",
+        "194263100461326246941821211252298397678",
+        "59759175005763961009877796927821517139",
     ]);
 
+    let start_prove = Instant::now();
     let (proof_hex, vk_hex) = noir_prove(to_string(&witness).unwrap(), String::from(bytecode));
     println!(
         "ultra_honk Proof Gen Done in {:?}ms",

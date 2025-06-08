@@ -4,7 +4,7 @@ With Noir/Nargo & Rust installed run,
 ```
 nargo compile
 cargo run --release
-sh ./set-env.sh
+source ./set-env.sh
 ```
 
 Build Test
